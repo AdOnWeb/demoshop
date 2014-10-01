@@ -1,0 +1,224 @@
+body {
+    font-family: 'Noto Serif', serif;
+    color: #333;
+    position: relative;
+    width: 960px;
+    left: 0;
+    right: 0;
+    margin: auto;
+    overflow-y: scroll;
+}
+
+div {
+    box-sizing: border-box;
+}
+
+a {
+    color: #336699;
+}
+
+header {
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+}
+
+header h1 {
+    font-family: 'Lobster', cursive;
+    font-size: 32pt;
+    position: relative;
+    margin-bottom: 0;
+}
+
+header h2 {
+    margin-top: 0;
+    font-size: 12pt;
+}
+
+aside {
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+ul {
+    margin: 0
+}
+
+.product-list {
+    font-size: 0;
+}
+
+.product-list .product-item {
+    font-size: 12pt;
+    display: inline-block;
+    width: 320px;
+    height: 320px;
+    padding: 30px;
+    margin: 0;
+}
+
+.product-page .product-item-image {
+    float: left;
+    margin-right: 40px;
+}
+
+.product-page .product-item-name {
+    font-size: 160%;
+}
+
+.product-item-name a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.product-list .product-item-image {
+    text-align: center;
+    width: 250px;
+    height: 250px;
+}
+
+.product-page .product-item-buy {
+    margin-top: 10px;
+}
+
+.product-item-similar-products {
+    margin-top: 100px;
+}
+
+.product-item-name {
+    text-align: left;
+    font-weight: bold;
+}
+
+.product-item-price {
+    font-style: italic;
+}
+
+.product-list .product-item-price {
+    float: right;
+    text-align: right;
+}
+
+.product-item-price sup {
+    color: #666;
+    line-height: 1em;
+}
+
+.product-list .product-item-buy {
+    float: left;
+    font-size: 80%;
+    text-align: left;
+}
+
+.product-list .product-item-bought {
+    float: right;
+    font-size: 80%;
+    text-align: right;
+}
+
+.basket-list {
+    padding-top: 20px;
+}
+
+.basket-list td {
+    text-align: center;
+}
+
+.basket-list tfoot td {
+    padding-top: 15px;
+}
+
+.basket-list tbody td {
+    border-bottom: 1px dotted #ddd;
+}
+
+.order-form {
+    padding-top: 20px;
+}
+
+.order-form input, .order-form textarea {
+    font-size: 150%;
+    width: 100%;
+    line-height: 1.5em;
+    font-family: inherit;
+    border: none;
+    border-bottom: 1px dotted #ccc;
+    color: #444;
+}
+
+.order-list td {
+    text-align: center;
+    border-bottom: 1px dotted #ccc;
+}
+
+.order-list tr:hover td {
+    background-color: #ffffbb;
+    cursor: pointer;
+}
+
+.order-view th {
+    vertical-align: top;
+    padding: 5px;
+}
+
+.landing-page {
+    text-align: center;
+    position: relative;
+}
+
+.landing-page h2 {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: auto;
+    top: 50px;
+    color: #333;
+    text-shadow: 0 0 5px white;
+}
+
+.sitemap {
+    margin: 50px 20px;
+    padding: 20px;
+    font-size: 90%;
+    border-top: 1px solid #ccc;
+}
+.sitemap > div {
+    display: inline-block
+}
+
+.info-popup-wrapper {
+    position: fixed;
+    top: 120px;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.info-popup {
+    background-color: #ffffff;
+    border: 1px #ccc solid;
+    border-radius: 3px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    width: 500px;
+    padding: 10px 30px;
+    margin: 10px;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+.info-popup button {
+    float: right;
+    font-weight: bold;
+    font-size: 18px;
+    line-height: 18px;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    border: 1px solid #333;
+    border-radius: 28px;
+    background-color: #333;
+    color: #fff;
+}

@@ -1,0 +1,11 @@
+<?php
+/**
+ * config.php
+ */
+
+namespace DemoShop;
+
+define('DEMOSHOP_DEBUG', false);
+define('DEMOSHOP_DOMAIN', 'demoshop.actionpay.ru');
+define('DEMOSHOP_DATABASE', 'host=localhost dbname=demoshop user=pgsql password=password');
+
