@@ -1,3 +1,11 @@
+<?
+namespace DemoShop;
+/**
+ * @var $title string
+ * @var $template string
+ * @var $this App
+ */
+?>
 <!DOCTYPE html>
 <html>
 <head lang="en">
@@ -63,6 +71,17 @@
 			})
 		});
 	</script>
+
+	<?
+	if ($this->infoPopupMessages) : ?>
+	<script>
+		$(function () {
+			<? foreach ($this->infoPopupMessages as $message): ?>
+			InfoPopup.show(<?= json_encode($message) ?>, false);
+			<? endforeach; ?>
+		});
+	</script>
+	<? endif; ?>
 </head>
 <body>
 	<div class="info-popup-wrapper"></div>
@@ -76,7 +95,7 @@
 	</header>
 
 	<article>
-		<? require \DemoShop\App::getTemplatePath($template); ?>
+		<? require App::getTemplatePath($template); ?>
 	</article>
 
 	<footer>

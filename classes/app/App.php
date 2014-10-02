@@ -3,6 +3,7 @@ namespace DemoShop;
 
 class App {
 	protected $routes = array();
+	protected $infoPopupMessages = array();
 
 	public function page($path, $callback) {
 		$this->routes[$path] = $callback;
@@ -93,5 +94,10 @@ class App {
 		} else {
 			return isset($_SESSION[$key]) ? $_SESSION[$key] : null;
 		}
+	}
+
+	public function addInfoPopup($message) {
+		$this->infoPopupMessages []= $message;
+		return $this;
 	}
 }
