@@ -40,7 +40,7 @@ class Database {
 				}
 				$conditions []= $this->field($whereField) . ' IN (' . implode(', ', $whereValueArray) . ')';
 			} else {
-				$operators = array('>', '<', '>=', '<=', '=');
+				$operators = array('>', '<', '>=', '<=', '!=', '=');
 				foreach ($operators as $operator) {
 					if (substr($whereField, -strlen($operator)) == $operator) {
 						$whereField = substr($whereField, 0, strlen($whereField) - strlen($operator));
