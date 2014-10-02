@@ -40,7 +40,14 @@ class Database {
 				}
 				$conditions []= $this->field($whereField) . ' IN (' . implode(', ', $whereValueArray) . ')';
 			} else {
-				$conditions []= $this->field($whereField) . ' = ' . $this->value($whereValue);
+				$operators = array('>', '<', '>=', '<=', '=');
+				foreach ($operators as $operator) {
+					if (substr($whereField, -strlen($operator)) == $operator) {
+						$whereField = substr($whereField, 0, strlen($whereField) - strlen($operator));
+						break;
+					}
+				}
+				$conditions []= $this->field($whereField) . ' ' . $operator . ' ' . $this->value($whereValue);
 			}
 		}
 		if (count($conditions) > 0) {
