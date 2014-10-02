@@ -44,11 +44,9 @@ namespace DemoShop;
 
 	<div class="product-item-similar-products">
 		Похожие продукты:<br/>
-		<? $similar = Product::getAll(array('category_id' => $product->category_id)) ?: array(); ?>
-
-		<? foreach ($similar as $similarProduct) if ($similarProduct->id != $product->id): ?>
+		<? foreach ($product->getSimilarProducts() as $similarProduct): ?>
 			<a href="/product?p=<?= $similarProduct->id ?>" title="<?= $similarProduct->name ?>"><img src="/img/small/<?= $similarProduct->image ?>" style="zoom: 0.5"></a>
-		<? endif; ?>
+		<? endforeach; ?>
 	</div>
 
 	<div style="clear: both"></div>

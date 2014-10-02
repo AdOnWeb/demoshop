@@ -14,6 +14,7 @@ class Product extends AbstractDbObject {
 	public $category_id;
 
 	protected $category;
+	protected $similarProducts;
 
 	/**
 	 * @return Category|null
@@ -35,5 +36,17 @@ class Product extends AbstractDbObject {
 
 	public function getPriceFormatted() {
 		return self::formatPrice($this->price);
+	}
+
+	public function getSimilarProducts() {
+		if ($this->similarProducts === null) {
+			$this->similarProducts = Product::getAll(
+				array(
+					'category_id' => $this->category_id,
+					'id!=' => $this->id
+				)
+			);
+		}
+		return $this->similarProducts;
 	}
 } 
