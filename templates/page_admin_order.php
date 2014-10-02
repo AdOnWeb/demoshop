@@ -77,6 +77,18 @@ namespace DemoShop;
 				</table>
 			</td>
 		</tr>
+		<tr>
+			<th>CPA</th>
+			<td>
+				<? if ($order->partner_name): ?>
+					Партнёр: <b><?= $order->partner_name ?></b><br/>
+					ID перехода: <b><?= $order->partner_traffic_id ?></b><br/>
+					ID заказа для партнёра: <b><?= $order->partner_order_id ?></b>
+				<? else: ?>
+					Нет партнера
+				<? endif; ?>
+			</td>
+		</tr>
 	</table>
 
 	<h4 style="text-align: left; padding: 20px"><a href="/admin">&larr; Вернуться к списку заказов</a></h4>

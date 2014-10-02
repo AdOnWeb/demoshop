@@ -26,6 +26,12 @@ class Order extends AbstractDbObject {
 	public $client_phone;
 	/** @dbcolumn */
 	public $client_address;
+	/** @dbcolumn */
+	public $partner_name;
+	/** @dbcolumn */
+	public $partner_traffic_id;
+	/** @dbcolumn */
+	public $partner_order_id;
 
 	protected $products = null;
 

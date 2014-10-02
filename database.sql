@@ -124,3 +124,9 @@ INSERT INTO "product" VALUES (default, 'Хрен',      'hradish.jpg',  16.00, 2
 -- -- Луковичные
 INSERT INTO "product" VALUES (default, 'Лук',       'onion.jpg',    19.95, 25);
 INSERT INTO "product" VALUES (default, 'Спаржа',    'asparagus.jpg',29.95, 25);
+
+
+-- Добавлено для интеграции с CPA
+ALTER TABLE "order" ADD COLUMN "partner_name" CHARACTER VARYING(64) NULL;
+ALTER TABLE "order" ADD COLUMN "partner_traffic_id" CHARACTER VARYING(255) NULL;
+ALTER TABLE "order" ADD COLUMN "partner_order_id" CHARACTER VARYING(64) NULL;

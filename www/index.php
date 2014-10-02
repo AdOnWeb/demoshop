@@ -19,6 +19,19 @@ try {
 	 */
 	$app = new App();
 
+	/**
+	 * Проверяем параметры запроса на наличие параметров перехода из CPA-сетей
+	 * CPA::checkTraffic() вернет true, если пользователь пришел на сайт по партнерской ссылке
+	 */
+	$isNewCpaTraffic = \Actionpay\CPA::checkTraffic();
+
+	// в целях демонстрации, идентификационные параметры партнера будут выведены на странице
+	if ($isNewCpaTraffic) {
+		$app->addInfoPopup(
+			'Вы перешли из <b>' . \Actionpay\CPA::getLastPartnerName() . '</b><br />' .
+			'Идентификатор перехода: <b>' . \Actionpay\CPA::getLastTrafficIdentifer() . '</b>'
+		);
+	}
 
 	/**
 	 * http://demoshop.actionpay.ru/shop.yml
@@ -66,6 +79,89 @@ try {
 		return $xml;
 	});
 
+
+	/**
+	 * http://demoshop.actionpay.ru/actionpay.xml
+	 * XML-отчет по заказам для Actionpay
+	 */
+	$app->page('/actionpay.xml', function () use ($app) {
+		header('Content-Type: text/xml');
+		$xml = '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL;
+
+		// параметры выборки заказов
+		$ordersCriteria = array('partner_name' => 'actionpay');
+
+		$password = md5('123456');
+		if (!isset($_POST['pass']) || $_POST['pass'] != $password) {
+			return $xml . '<error>wrong password</error>' . PHP_EOL;
+
+		} else if (isset($_POST['xml'])) {
+			// запрос по id заказов
+			preg_match_all('#<item>([^<]+)</item>#', $_POST['xml'], $items);
+			$orderIds = isset($items[1]) ? $items[1] : array();
+
+			if (count($orderIds) > 0) {
+				$ordersCriteria['partner_order_id'] = $orderIds;
+			}
+
+		} else if (isset($_POST['date'])) {
+			// запрос за временной период
+			$startDate = strtotime($_POST['date']);
+
+			if (!$startDate) {
+				return $xml . '<error>wrong request: bad "date" param</error>' . PHP_EOL;
+
+			} else {
+				$ordersCriteria['date>='] = date('Y-m-d H:i:s', $startDate);
+			}
+
+		} else {
+			return $xml . '<error>wrong request: no "xml" or "date" param</error>' . PHP_EOL;
+		}
+
+		// получаем заказы из БД
+		$orders = Order::getAll($ordersCriteria);
+
+		// генерация списка заказов в XML
+		if (count($orders) > 0) {
+			$xml .= '<items>' . PHP_EOL;
+			foreach ($orders as $order) {
+				switch ($order->status) {
+					// заказ оплачен и доставлен -> действие необходимо принять
+					case Order::STATUS_DELIVERED: 	$status = \Actionpay\CPA::ACTIONPAY_STATUS_ACCEPT; 	break;
+					// заказ отменён -> действие необходимо отклонить
+					case Order::STATUS_CANCELED:  	$status = \Actionpay\CPA::ACTIONPAY_STATUS_REJECT; 	break;
+					// все другие неокончательные статусы заказа -> действие находится в обработке
+					default:					  	$status = \Actionpay\CPA::ACTIONPAY_STATUS_PROCESSING;
+				}
+				// определяем клик и источник из идентификатора трафика
+				$source = null;
+				$click = null;
+				if (strpos($order->partner_traffic_id, '.') !== false) {
+					// есть [клик].[источник]
+					list($click, $source) = explode('.', $order->partner_traffic_id);
+				} else if (is_numeric($order->partner_traffic_id)) {
+					// есть только источник
+					$source = $order->partner_traffic_id;
+				} else {
+					// есть только клик
+					$click = $order->partner_traffic_id;
+				}
+
+				$xml .= '	<item>' . PHP_EOL;
+				$xml .= '		<id>' . 	$order->partner_order_id . '</id>' . PHP_EOL;
+				$xml .= '		<date>' . 	$order->date . '</date>' . PHP_EOL;
+				$xml .= '		<status>' . $status . '</status>' . PHP_EOL;
+				$xml .= '		<price>' . 	$order->getTotalPrice() . '</price>' . PHP_EOL;
+				$xml .= '		<source>' . $source . '</source>' . PHP_EOL;
+				$xml .= '		<click>' . 	$click . '</click>' . PHP_EOL;
+				$xml .= '	</item>' . PHP_EOL;
+			}
+			$xml .= '</items>' . PHP_EOL;
+		}
+
+		return $xml;
+	});
 
 	/**
 	 * http://demoshop.actionpay.ru/fruits
@@ -182,6 +278,19 @@ try {
 			$order->client_phone = $phone;
 			$order->client_address = $address;
 			$order->save();
+
+			/**
+			 * Если клиент был приведён на сайт через партнёра, сохраним в заказ партнерскую информацию
+			 */
+			if (\Actionpay\CPA::getLastPartnerName()) {
+				// Имя партнёра и идентификатор трафика, хранящиеся в cookie клиента
+				$order->partner_name 		= \Actionpay\CPA::getLastPartnerName();
+				$order->partner_traffic_id 	= \Actionpay\CPA::getLastTrafficIdentifer();
+				// Генерируем уникальный ID для отслеживания заказа патрнером.
+				// Очень важно, чтобы этот ID генерировался случайным образом!
+				$order->partner_order_id 	= $order->id . '_' . sprintf('%06x', rand(0, pow(2, 24)-1));
+				$order->save();
+			}
 
 			foreach ($basket as $productId => $count) {
 				$orderProduct = new OrderProduct();

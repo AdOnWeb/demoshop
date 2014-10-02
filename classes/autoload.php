@@ -8,7 +8,7 @@ spl_autoload_register(function ($className) {
 		return null;
 	}
 
-	$paths = array('classes/app', 'classes/business');
+	$paths = array('classes/app', 'classes/business', 'classes/actionpay');
 	foreach ($paths as $path) {
 		$classPath = DEMOSHOP_PATH . "/{$path}/{$className}.php";
 		if (file_exists($classPath)) {
