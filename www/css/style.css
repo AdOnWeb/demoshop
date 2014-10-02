@@ -224,3 +224,12 @@ ul {
     background-color: #333;
     color: #fff;
 }
+
+.aprt-data {
+    font-family: monospace;
+    font-size: 8pt;
+    background: #eee;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 2px;
+}

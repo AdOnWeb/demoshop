@@ -172,7 +172,10 @@ try {
 			'title' => 'Фрукты',
 			'image' => '/img/landing/fruits.jpg',
 			'promo' => 'Не психуй, купи вкусных сочных маракуй!',
-			'link' => '/?c=' . Category::FRUITS_ID
+			'link' => '/?c=' . Category::FRUITS_ID,
+			'aprtData' => array(
+				'pageType' => \Actionpay\APRT::PAGETYPE_MAIN
+			)
 		));
 	});
 
@@ -186,7 +189,10 @@ try {
 			'title' => 'Фрукты',
 			'image' => '/img/landing/vegetables.jpg',
 			'promo' => 'Купи овощей, свари восхитительных щей!',
-			'link' => '/?c=' . Category::VEGETABLES_ID
+			'link' => '/?c=' . Category::VEGETABLES_ID,
+			'aprtData' => array(
+				'pageType' => \Actionpay\APRT::PAGETYPE_MAIN
+			)
 		));
 	});
 
@@ -225,7 +231,15 @@ try {
 				'productNewCount' => isset($basket[$product->id]) ? $basket[$product->id] : 0,
 				'basketTotalItems' => $basketTotalItems,
 				'basketTotalPrice' => $basketTotalPrice,
-				'basketTotalPriceFormatted' => Product::formatPrice($basketTotalPrice)
+				'basketTotalPriceFormatted' => Product::formatPrice($basketTotalPrice),
+				'aprtData' => array(
+					'pageType' => $count > 0 ? \Actionpay\APRT::PAGETYPE_CART_ADD : \Actionpay\APRT::PAGETYPE_CART_REMOVE,
+					'currentProduct' => array(
+						'id' 	=> $product->id,
+						'name' 	=> $product->name,
+						'price' => $product->price
+					)
+				)
 			));
 		} else {
 			$app->redirect($_SERVER['HTTP_REFERER'] ?: '/');
@@ -246,12 +260,26 @@ try {
 			$products = array();
 		}
 
+		$aprtData = array(
+			'pageType' => \Actionpay\APRT::PAGETYPE_BASKET,
+			'basketProducts' => array()
+		);
+		foreach ($products as $product) {
+			$aprtData['basketProducts'][] = array(
+				'id' 		=> $product->id,
+				'name' 		=> $product->name,
+				'price' 	=> $product->price,
+				'quantity' 	=> $basket[$product->id]
+			);
+		}
+
 		return $app->render('page_basket', array(
 			'title' => 'Корзина',
 			'products' => $products,
 			'basket' => $basket,
 			'basketTotalItems' => $app->session('basketTotalItems') ?: 0,
 			'basketTotalPrice' => $app->session('basketTotalPrice') ?: 0,
+			'aprtData' => $aprtData
 		));
 	});
 
@@ -311,9 +339,29 @@ try {
 			return '';
 		}
 
+		$basket = $app->session('basket');
+		if (!empty($basket)) {
+			$products = Product::getAll(array('id' => array_keys($basket)), array('name' => true));
+		} else {
+			$products = array();
+		}
+		$aprtData = array(
+			'pageType' => \Actionpay\APRT::PAGETYPE_PURCHASE,
+			'basketProducts' => array()
+		);
+		foreach ($products as $product) {
+			$aprtData['basketProducts'][] = array(
+				'id' 		=> $product->id,
+				'name' 		=> $product->name,
+				'price' 	=> $product->price,
+				'quantity' 	=> $basket[$product->id]
+			);
+		}
+
 		// отображение формы заказа
 		return $app->render('page_order', array(
 			'title' => 'Оформление заказа',
+			'aprtData' => $aprtData
 		));
 	});
 
@@ -323,9 +371,27 @@ try {
 	 * Страница "спасибо за заказ"
 	 */
 	$app->page('/thankyou', function (Order $order) use ($app) {
+		$aprtData = array(
+			'pageType' => \Actionpay\APRT::PAGETYPE_THANKYOU,
+			'purchasedProducts' => array(),
+			'orderInfo' => array(
+				'id' => $order->id,
+				'totalPrice' => $order->getTotalPrice()
+			)
+		);
+		foreach ($order->getOrderedProducts() as $orderProduct) {
+			$aprtData['purchasedProducts'][] = array(
+				'id' 		=> $orderProduct->getProduct()->id,
+				'name' 		=> $orderProduct->getProduct()->name,
+				'price' 	=> $orderProduct->getProduct()->price,
+				'quantity' 	=> $orderProduct->count
+			);
+		}
+
 		return $app->render('page_thankyou', array(
 			'title' => 'Спасибо за заказ',
-			'order' => $order
+			'order' => $order,
+			'aprtData' => $aprtData
 		));
 	});
 
@@ -371,12 +437,50 @@ try {
 	 * Страница просмотра одного товара
 	 */
 	$app->page('/product', function (Product $p) use ($app) {
+		$product = $p;
+
+		$aprtData = array(
+			'pageType' => \Actionpay\APRT::PAGETYPE_PRODUCT,
+			'currentProduct' => array(
+				'id' 	=> $product->id,
+				'name' 	=> $product->name,
+				'price' => $product->price
+			),
+			'similarProducts' => array(),
+			'currentCategory' => array(
+				'id' 	=> $product->getCategory()->id,
+				'name' 	=> $product->getCategory()->name,
+			),
+			'parentCategories' => array(),
+			'childCategories' => array(),
+		);
+		foreach ($product->getSimilarProducts() as $similarProduct) {
+			$aprtData['similarProducts'][] = array(
+				'id' 	=> $similarProduct->id,
+				'name' 	=> $similarProduct->name,
+				'price' => $similarProduct->price
+			);
+		}
+		foreach ($product->getCategory()->getAllParents() as $parentCategory) {
+			$aprtData['parentCategories'][] = array(
+				'id' 	=> $parentCategory->id,
+				'name' 	=> $parentCategory->name
+			);
+		}
+		foreach ($product->getCategory()->getChildren() as $childCategory) {
+			$aprtData['childCategories'][] = array(
+				'id' 	=> $childCategory->id,
+				'name' 	=> $childCategory->name
+			);
+		}
+
 		return $app->render('page_product', array(
 			'title' => $p->name,
 			'product' => $p,
 			'basket' => $app->session('basket') ?: array(),
 			'basketTotalItems' => $app->session('basketTotalItems') ?: 0,
 			'basketTotalPrice' => $app->session('basketTotalPrice') ?: 0,
+			'aprtData' => $aprtData
 		));
 	});
 
@@ -407,6 +511,35 @@ try {
 
 		$products = Product::getAll($productCriteria, array('name' => true));
 
+		if ($category === null) {
+			$aprtData = array(
+				'pageType' => \Actionpay\APRT::PAGETYPE_MAIN
+			);
+		} else {
+			$aprtData = array(
+				'pageType' => \Actionpay\APRT::PAGETYPE_CATALOG,
+				'currentCategory' => array(
+					'id' 	=> $category->id,
+					'name' 	=> $category->name,
+				),
+				'parentCategories' => array(),
+				'childCategories' => array(),
+			);
+
+			foreach ($category->getAllParents() as $parentCategory) {
+				$aprtData['parentCategories'][] = array(
+					'id' 	=> $parentCategory->id,
+					'name' 	=> $parentCategory->name
+				);
+			}
+			foreach ($category->getChildren() as $childCategory) {
+				$aprtData['childCategories'][] = array(
+					'id' 	=> $childCategory->id,
+					'name' 	=> $childCategory->name
+				);
+			}
+		}
+
 		return $app->render('page_main', array(
 			'title' => $category ? $category->name : 'Главная',
 			'category' => $category,
@@ -414,6 +547,7 @@ try {
 			'basket' => $app->session('basket') ?: array(),
 			'basketTotalItems' => $app->session('basketTotalItems') ?: 0,
 			'basketTotalPrice' => $app->session('basketTotalPrice') ?: 0,
+			'aprtData' => $aprtData
 		));
 	});
 

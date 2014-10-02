@@ -64,6 +64,15 @@ namespace DemoShop;
 						var infoText = '<b>' + data.productName + '</b> - ' +
 							(isAdding ? 'добавлено в корзину' : 'убрано из корзины');
 
+						if (data.aprtData && typeof window.APRT_SEND === 'function') {
+							// Отправляем в APRT событие добавления/удаления товара
+							window.APRT_SEND(data.aprtData);
+
+							infoText += '<div class="aprt-data">' +
+										'APRT_SEND(' + JSON.stringify(data.aprtData) + ')' +
+										'</div>';
+						}
+
 						InfoPopup.show(infoText, true);
 					}
 				}, 'json');
@@ -82,6 +91,28 @@ namespace DemoShop;
 		});
 	</script>
 	<? endif; ?>
+
+	<script type="text/javascript">
+		(function() {
+			var s = document.createElement('script');
+			s.type = 'text/javascript';
+			s.async = s.defer = true;
+			s.src = '//aprtx.com/code/demoshop/';
+			var p = document.getElementsByTagName('body')[0] ||
+				document.getElementsByTagName('head')[0];
+			if (p) p.appendChild(s);
+		})();
+	</script>
+
+	<script>
+		<? $aprtDataJson = json_encode(
+			isset($aprtData) ? $aprtData : array('pageType' => \Actionpay\APRT::PAGETYPE_OTHER),
+			JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+		) ?>
+
+		window.APRT_DATA = <?= $aprtDataJson ?>;
+	</script>
+
 </head>
 <body>
 	<div class="info-popup-wrapper"></div>
@@ -100,5 +131,7 @@ namespace DemoShop;
 
 	<footer>
 	</footer>
+
+	<pre class="aprt-data">window.APRT_DATA = <?= $aprtDataJson ?>;</pre>
 </body>
 </html>
