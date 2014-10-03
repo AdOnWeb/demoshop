@@ -35,7 +35,7 @@ class Category extends AbstractDbObject {
 			$allParents []= $parent;
 			$parent = $parent->getParent();
 		}
-		return $allParents;
+		return array_reverse($allParents);
 	}
 
 	/**
