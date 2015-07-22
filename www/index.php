@@ -49,7 +49,7 @@ try {
 		$xml .= '		<offers>' . PHP_EOL;
 		$products = Product::getAll();
 		foreach ($products as $product) {
-			$xml .= '			<offer available="true">' . PHP_EOL;
+			$xml .= '			<offer id="' . $product->id . '" available="true">' . PHP_EOL;
 			$xml .= '				<url>http://' . DEMOSHOP_DOMAIN . '/product?p=' . $product->id . '</url>' . PHP_EOL;
 			$xml .= '				<price>' . $product->price . '</price>' . PHP_EOL;
 			$xml .= '				<currencyId>RUR</currencyId>' . PHP_EOL;
