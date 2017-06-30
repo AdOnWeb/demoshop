@@ -123,42 +123,58 @@ try {
 		$orders = Order::getAll($ordersCriteria);
 
 		// генерация списка заказов в XML
-		if (count($orders) > 0) {
-			$xml .= '<items>' . PHP_EOL;
-			foreach ($orders as $order) {
-				switch ($order->status) {
-					// заказ оплачен и доставлен -> действие необходимо принять
-					case Order::STATUS_DELIVERED: 	$status = \Actionpay\CPA::ACTIONPAY_STATUS_ACCEPT; 	break;
-					// заказ отменён -> действие необходимо отклонить
-					case Order::STATUS_CANCELED:  	$status = \Actionpay\CPA::ACTIONPAY_STATUS_REJECT; 	break;
-					// все другие неокончательные статусы заказа -> действие находится в обработке
-					default:					  	$status = \Actionpay\CPA::ACTIONPAY_STATUS_PROCESSING;
-				}
-				// определяем клик и источник из идентификатора трафика
-				$source = null;
-				$click = null;
-				if (strpos($order->partner_traffic_id, '.') !== false) {
-					// есть [клик].[источник]
-					list($click, $source) = explode('.', $order->partner_traffic_id);
-				} else if (is_numeric($order->partner_traffic_id)) {
-					// есть только источник
-					$source = $order->partner_traffic_id;
-				} else {
-					// есть только клик
-					$click = $order->partner_traffic_id;
-				}
+        $xml .= '<items>' . PHP_EOL;
+        foreach ($orders as $order) {
+            switch ($order->status) {
+                // заказ оплачен и доставлен -> действие необходимо принять
+                case Order::STATUS_DELIVERED: 	$status = \Actionpay\CPA::ACTIONPAY_STATUS_ACCEPT; 	break;
+                // заказ отменён -> действие необходимо отклонить
+                case Order::STATUS_CANCELED:  	$status = \Actionpay\CPA::ACTIONPAY_STATUS_REJECT; 	break;
+                // все другие неокончательные статусы заказа -> действие находится в обработке
+                default:					  	$status = \Actionpay\CPA::ACTIONPAY_STATUS_PROCESSING;
+            }
+            // определяем клик и источник из идентификатора трафика
+            $source = null;
+            $click = null;
+            if (strpos($order->partner_traffic_id, '.') !== false) {
+                // есть [клик].[источник]
+                list($click, $source) = explode('.', $order->partner_traffic_id);
+            } else if (is_numeric($order->partner_traffic_id)) {
+                // есть только источник
+                $source = $order->partner_traffic_id;
+            } else {
+                // есть только клик
+                $click = $order->partner_traffic_id;
+            }
 
-				$xml .= '	<item>' . PHP_EOL;
-				$xml .= '		<id>' . 	$order->partner_order_id . '</id>' . PHP_EOL;
-				$xml .= '		<date>' . 	$order->date . '</date>' . PHP_EOL;
-				$xml .= '		<status>' . $status . '</status>' . PHP_EOL;
-				$xml .= '		<price>' . 	$order->getTotalPrice() . '</price>' . PHP_EOL;
-				$xml .= '		<source>' . $source . '</source>' . PHP_EOL;
-				$xml .= '		<click>' . 	$click . '</click>' . PHP_EOL;
-				$xml .= '	</item>' . PHP_EOL;
-			}
-			$xml .= '</items>' . PHP_EOL;
-		}
+            /** @var OrderProduct[] $orderProducts */
+            $orderProducts = $order->getOrderedProducts();
+
+            $xml .= '	<item>' . PHP_EOL;
+            $xml .= '		<id>' . 	$order->partner_order_id    . '</id>' . PHP_EOL;
+            $xml .= '		<date>' . 	$order->date                . '</date>' . PHP_EOL;
+            $xml .= '		<status>' . $status                     . '</status>' . PHP_EOL;
+            $xml .= '		<price>' . 	$order->getTotalPrice()     . '</price>' . PHP_EOL;
+            $xml .= '		<source>' . $source                     . '</source>' . PHP_EOL;
+            $xml .= '		<click>' . 	$click                      . '</click>' . PHP_EOL;
+            $xml .= '		<details>' . PHP_EOL;
+            $xml .= '		    <clientType>new</clientType>' . PHP_EOL;
+            $xml .= '		    <items>' . PHP_EOL;
+            foreach ($orderProducts as $item) {
+                $xml .= '		        <item>' . PHP_EOL;
+                $xml .= '		            <productID>'    . $item->getProduct()->id                   . '</productID>' . PHP_EOL;
+                $xml .= '		            <productName>'  . htmlspecialchars($item->getProduct()->name). '</productName>' . PHP_EOL;
+                $xml .= '		            <quantity>'     . $item->count                              . '</quantity>' . PHP_EOL;
+                $xml .= '		            <price>'        . $item->getProduct()->price                . '</price>' . PHP_EOL;
+                $xml .= '		            <categoryID>'   . $item->getProduct()->category_id          . '</categoryID>' . PHP_EOL;
+                $xml .= '		            <categoryName>' . htmlspecialchars($item->getProduct()->getCategory()->name) . '</categoryName>' . PHP_EOL;
+                $xml .= '		        </item>' . PHP_EOL;
+            }
+            $xml .= '		    </items>' . PHP_EOL;
+            $xml .= '		</details>' . PHP_EOL;
+            $xml .= '	</item>' . PHP_EOL;
+        }
+        $xml .= '</items>' . PHP_EOL;
 
 		return $xml;
 	});
