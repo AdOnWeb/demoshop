@@ -86,19 +86,31 @@ namespace DemoShop;
 <body>
 	<div class="info-popup-wrapper"></div>
 
-	<div style="position: absolute; right: 0; top: -20px">
-		<a href="/admin">вход для персонала</a>
-	</div>
-	<header onclick="location.href = '/'">
-		<h1>Овощи & Фрукты</h1>
-		<h2>—— Интернет-магазин ——</h2>
-	</header>
+    <div class="header-wrapper">
+        <div class="header-right-block">
+            <a href="/admin">вход для персонала</a>
+        </div>
+        <div class="header-left-block">
+            Телефон нашего магазина:
+            <div class="phone">
+                <a href="tel:+74950000000">+7 (495) 000-00-00</a>
+            </div>
+        </div>
+        <header onclick="location.href = '/'">
+            <h1>Овощи & Фрукты</h1>
+            <h2>—— Интернет-магазин ——</h2>
+        </header>
+    </div>
 
 	<article>
 		<? require App::getTemplatePath($template); ?>
 	</article>
 
 	<footer>
-	</footer>
+        <div class="phone" style="float: right">
+            +7 (495) 000-00-00
+        </div>
+        &copy; Магазин "Овощи и фрукты", <?= date('Y') ?>.
+    </footer>
 </body>
 </html>
