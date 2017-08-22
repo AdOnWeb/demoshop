@@ -193,6 +193,7 @@ ul {
     right: 0;
     text-align: center;
     z-index: 200;
+    pointer-events: none;
 }
 
 .info-popup {
@@ -209,6 +210,7 @@ ul {
     margin-right: auto;
     text-align: left;
     opacity: 0.9;
+    pointer-events: all;
 }
 
 .info-popup button {
