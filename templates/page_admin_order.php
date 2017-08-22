@@ -10,7 +10,10 @@ namespace DemoShop;
 	<table class="order-view" width="100%">
 		<tr>
 			<th>Заказ №</th>
-			<td><?= $order->id ?></td>
+			<td>
+                <?= $order->id ?>
+                (<?= $order->getOrderedOnName() ?>)
+            </td>
 		</tr>
 		<tr>
 			<th>Дата</th>
@@ -19,6 +22,10 @@ namespace DemoShop;
 		<tr>
 			<th>Клиент</th>
 			<td><?= $order->client_name ?></td>
+		</tr>
+		<tr>
+			<th>Телефон</th>
+			<td><?= $order->client_phone ?></td>
 		</tr>
 		<tr>
 			<th>Сумма</th>

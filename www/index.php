@@ -83,13 +83,19 @@ try {
 	/**
 	 * http://demoshop.actionpay.ru/actionpay.xml
 	 * XML-отчет по заказам для Actionpay
-	 */
-	$app->page('/actionpay.xml', function () use ($app) {
+     * http://demoshop.actionpay.ru/actionpay.xml?calltracking=true
+     * XML-отчет по заказам через Calltracking
+     */
+	$app->page('/actionpay.xml', function ($calltracking = null) use ($app) {
 		header('Content-Type: text/xml');
 		$xml = '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL;
 
 		// параметры выборки заказов
-		$ordersCriteria = array('partner_name' => 'actionpay');
+        if ($calltracking) {
+            $ordersCriteria = array('ordered_on' => Order::ORDERED_BY_PHONE);
+        } else {
+            $ordersCriteria = array('partner_name' => 'actionpay');
+        }
 
 		$password = md5('123456');
 		if (!isset($_POST['pass']) || $_POST['pass'] != $password) {
@@ -155,8 +161,12 @@ try {
             $xml .= '		<date>' . 	$order->date                . '</date>' . PHP_EOL;
             $xml .= '		<status>' . $status                     . '</status>' . PHP_EOL;
             $xml .= '		<price>' . 	$order->getTotalPrice()     . '</price>' . PHP_EOL;
-            $xml .= '		<source>' . $source                     . '</source>' . PHP_EOL;
-            $xml .= '		<click>' . 	$click                      . '</click>' . PHP_EOL;
+            if ($calltracking) {
+                $xml .= '	<phone>' . 	$order->client_phone        . '</phone>' . PHP_EOL;
+            } else {
+                $xml .= '	<source>' . $source                     . '</source>' . PHP_EOL;
+                $xml .= '	<click>' . 	$click                      . '</click>' . PHP_EOL;
+            }
             $xml .= '		<details>' . PHP_EOL;
             $xml .= '		    <clientType>new</clientType>' . PHP_EOL;
             $xml .= '		    <items>' . PHP_EOL;
@@ -318,6 +328,7 @@ try {
 			$order = new Order();
 			$order->date = date('Y-m-d H:i:s');
 			$order->status = Order::STATUS_UNCONFIRMED;
+			$order->ordered_on = Order::ORDERED_ON_WEBSITE;
 			$order->client_name = $name;
 			$order->client_phone = $phone;
 			$order->client_address = $address;
@@ -433,6 +444,42 @@ try {
 		));
 	});
 
+    /**
+     * http://demoshop.actionpay.ru/admin/phonecall
+     */
+	$app->page('/admin/phonecall', function ($phone = null, $name = null, $address = null, $products = []) use ($app) {
+        if ($phone && $name && $address && $products) {
+            $order = new Order();
+            $order->date = date('Y-m-d H:i:s');
+            $order->status = Order::STATUS_CONFIRMED;
+            $order->ordered_on = Order::ORDERED_BY_PHONE;
+            $order->client_name = $name;
+            $order->client_phone = $phone;
+            $order->client_address = $address;
+            $order->save();
+
+            foreach ($products as $productId => $count) {
+                if ($count <= 0) continue;
+                $orderProduct = new OrderProduct();
+                $orderProduct->order_id = $order->id;
+                $orderProduct->product_id = $productId;
+                $orderProduct->count = $count;
+                $orderProduct->save();
+            }
+
+            // редирект на страницу просмотра
+            $app->redirect('/admin/order?order=' . $order->id);
+
+        }
+
+        return $app->render('page_admin_phonecall', array(
+            'title'    => 'Новый заказ по телефону',
+            'phone'    => $phone,
+            'name'     => $name,
+            'address'  => $address,
+            'products' => $products,
+        ));
+    });
 
 	/**
 	 * http://demoshop.actionpay.ru/admin

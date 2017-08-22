@@ -9,12 +9,20 @@ class Order extends AbstractDbObject {
 	const STATUS_DELIVERED = 3;
 	const STATUS_CANCELED = 9;
 
+	const ORDERED_ON_WEBSITE = 1;
+	const ORDERED_BY_PHONE = 2;
+
 	public static $statusList = array(
 		self::STATUS_UNCONFIRMED 	=> 'Не подтвержден',
 		self::STATUS_CONFIRMED 		=> 'Подтвержден',
 		self::STATUS_DELIVERED 		=> 'Доставлен и оплачен',
 		self::STATUS_CANCELED 		=> 'Отменен',
 	);
+
+	public static $orderedOnList = array(
+        self::ORDERED_ON_WEBSITE => 'Заказ с сайта',
+        self::ORDERED_BY_PHONE   => 'Заказ по телефону'
+    );
 
 	/** @dbcolumn */
 	public $date;
@@ -27,6 +35,8 @@ class Order extends AbstractDbObject {
 	/** @dbcolumn */
 	public $client_address;
 	/** @dbcolumn */
+	public $ordered_on;
+	/** @dbcolumn */
 	public $partner_name;
 	/** @dbcolumn */
 	public $partner_traffic_id;
@@ -35,11 +45,24 @@ class Order extends AbstractDbObject {
 
 	protected $products = null;
 
+    /**
+     * @return string
+     */
 	public function getStatusName() {
 		if (isset(self::$statusList[$this->status])) {
 			return self::$statusList[$this->status];
 		}
 		return 'Неизвестно';
+	}
+
+    /**
+     * @return string
+     */
+    public function getOrderedOnName() {
+        if (isset(self::$orderedOnList[$this->ordered_on])) {
+            return self::$orderedOnList[$this->ordered_on];
+        }
+        return '';
 	}
 
 	/**

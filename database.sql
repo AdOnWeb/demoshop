@@ -33,6 +33,7 @@ CREATE TABLE "order" (
   "client_phone" CHARACTER VARYING(255) NOT NULL,
   "client_address" CHARACTER VARYING(1024) NOT NULL,
   "status" INT NOT NULL,
+  "ordered_on" INT NOT NULL,
   PRIMARY KEY("id")
 );
 

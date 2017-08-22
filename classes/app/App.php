@@ -57,7 +57,11 @@ class App {
 					}
 				}
 			} else {
-				$paramValue = htmlspecialchars($paramValue);
+			    if (is_array($paramValue)) {
+			        array_walk_recursive($paramValue, 'htmlspecialchars');
+                } else if (is_string($paramValue)) {
+                    $paramValue = htmlspecialchars($paramValue);
+                }
 			}
 			$handlerParams[$paramName] = $paramValue;
 		}
