@@ -104,6 +104,18 @@ namespace DemoShop;
 		})();
 	</script>
 
+	<script type="text/javascript">
+		(function() {
+			var s = document.createElement('script');
+			s.type = 'text/javascript';
+			s.async = s.defer = true;
+			s.src = '//ct.actionpay.ru/js/client.js';
+			var p = document.getElementsByTagName('body')[0] ||
+				document.getElementsByTagName('head')[0];
+			if (p) p.appendChild(s);
+		})();
+	</script>
+
 	<script>
 		<? $aprtDataJson = json_encode(
 			isset($aprtData) ? $aprtData : array('pageType' => \Actionpay\APRT::PAGETYPE_OTHER),
