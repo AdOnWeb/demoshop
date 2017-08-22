@@ -17,22 +17,51 @@ a {
     color: #336699;
 }
 
-header {
-    width: 100%;
+.header-wrapper {
+    position: relative;
     text-align: center;
-    cursor: pointer;
+    margin-top: 30px;
+}
+
+.header-right-block {
+    top: 0;
+    right: 0;
+    position: absolute;
+}
+
+.header-left-block {
+    top: 0;
+    left: 0;
+    position: absolute;
+}
+
+.header-wrapper .phone {
+    font-size: 1.6em;
+    font-weight: bold;
+}
+
+.phone a {
+    text-decoration: none;
+}
+
+header {
+    display: inline-block;
 }
 
 header h1 {
     font-family: 'Lobster', cursive;
     font-size: 32pt;
     position: relative;
-    margin-bottom: 0;
+    margin: 0;
+    text-align: center;
+    cursor: pointer;
 }
 
 header h2 {
-    margin-top: 0;
+    margin: 0;
     font-size: 12pt;
+    text-align: center;
+    cursor: pointer;
 }
 
 aside {
@@ -233,5 +262,6 @@ ul {
     background: #eee;
     border: 1px solid #ddd;
     border-radius: 3px;
+    margin-top: 10px;
     padding: 2px;
 }
