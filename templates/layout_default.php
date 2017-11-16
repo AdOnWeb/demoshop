@@ -104,17 +104,21 @@ namespace DemoShop;
 		})();
 	</script>
 
-	<script type="text/javascript">
-		(function() {
-			var s = document.createElement('script');
-			s.type = 'text/javascript';
-			s.async = s.defer = true;
-			s.src = '//ct.actionpay.ru/js/client.js';
-			var p = document.getElementsByTagName('body')[0] ||
-				document.getElementsByTagName('head')[0];
-			if (p) p.appendChild(s);
-		})();
-	</script>
+    <script type="text/javascript">
+        (function () {
+            window.APCConfig = {
+                phoneWrapper: "phone",
+                phoneTemplate: "<a href=\"tel:{{99999999999}}\">{{+9 (999) 999-99-99}}</a>"
+            };
+
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.async = script.defer = true;
+            script.src = "//ct.actionpay.ru:1516/js/client.js?offerId=4536";
+            var p = document.getElementsByTagName("body")[0] || document.getElementsByTagName("head")[0];
+            if (p) p.appendChild(script);
+        })();
+    </script>
 
 	<script>
 		<? $aprtDataJson = json_encode(
