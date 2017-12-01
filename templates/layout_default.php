@@ -114,7 +114,7 @@ namespace DemoShop;
             var script = document.createElement("script");
             script.type = "text/javascript";
             script.async = script.defer = true;
-            script.src = "//ct.actionpay.ru:1516/js/client.js?offerId=4536";
+            script.src = "//call.actionpay.ru/js/client.js?offerId=4536";
             var p = document.getElementsByTagName("body")[0] || document.getElementsByTagName("head")[0];
             if (p) p.appendChild(script);
         })();
