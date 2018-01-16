@@ -107,7 +107,7 @@ namespace DemoShop;
     <script type="text/javascript">
         (function () {
             window.APCConfig = {
-                phoneWrapper: "phone",
+                phoneWrapper: ".phone",
                 phoneTemplate: "<a href=\"tel:{{99999999999}}\">{{+9 (999) 999-99-99}}</a>"
             };
 
