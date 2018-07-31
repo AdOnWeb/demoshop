@@ -98,7 +98,7 @@ class CPA {
 	public static function getPixelUrl($partnerName, $trafficId, $orderId, $orderSum = 0.0) {
 		switch ($partnerName) {
 			case 'actionpay':
-				$url = '//n.actionpay.ru/ok/' . self::ACTIONPAY_AIM_ID . '.png?apid=' . $orderId;
+				$url = '//apypp.com/ok/' . self::ACTIONPAY_AIM_ID . '.png?apid=' . $orderId;
 				if ($trafficId) {
 					$url .= '&actionpay=' . $trafficId;
 				}
