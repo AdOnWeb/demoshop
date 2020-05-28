@@ -223,6 +223,12 @@ try {
 	});
 
 
+	$app->page('/everyday', function () use ($app) {
+	    return $app->render('page_everyday', array(
+	        'title' => 'Свежее утро',
+        ));
+    });
+
 	/**
 	 * http://demoshop.actionpay.ru/buy?product=<PRODUCT_ID>&count=<COUNT>[&ajax=true]
 	 * Метод для изменения количества товара №<PRODUCT_ID> на <COUNT> единиц
